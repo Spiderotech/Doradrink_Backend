@@ -39,14 +39,6 @@ const envSchema = z.object({
 }).superRefine((value, ctx) => {
   if (value.NODE_ENV !== 'production') return;
 
-  if (value.APP_CORS_ORIGIN.split(',').map(origin => origin.trim()).includes('*')) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['APP_CORS_ORIGIN'],
-      message: 'APP_CORS_ORIGIN must list explicit admin/app origins in production.',
-    });
-  }
-
   if (!value.ADMIN_EMAIL) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
