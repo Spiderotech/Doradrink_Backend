@@ -96,16 +96,38 @@ export const notificationService = {
       ? new Types.ObjectId(input.userId)
       : null;
 
-    return DeviceTokenModel.findOneAndUpdate(
-      { token: input.token },
-      {
+    const update: {
+      $set: {
+        token: string;
+        platform: 'ios' | 'android' | 'unknown';
+        guestInstallId: string | null;
+        enabled: boolean;
+        lastSeenAt: Date;
+        userId?: Types.ObjectId;
+      };
+      $setOnInsert: {
+        userId: Types.ObjectId | null;
+      };
+    } = {
+      $set: {
         token: input.token,
         platform: input.platform,
         guestInstallId: input.guestInstallId || null,
-        userId: userObjectId,
         enabled: true,
         lastSeenAt: new Date(),
       },
+      $setOnInsert: {
+        userId: userObjectId,
+      },
+    };
+
+    if (userObjectId) {
+      update.$set.userId = userObjectId;
+    }
+
+    return DeviceTokenModel.findOneAndUpdate(
+      { token: input.token },
+      update,
       { new: true, upsert: true, setDefaultsOnInsert: true },
     ).lean();
   },
