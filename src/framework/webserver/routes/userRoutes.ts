@@ -7,3 +7,4 @@ export const userRoutes = Router();
 
 userRoutes.post('/bootstrap', asyncHandler(userController.bootstrap));
 userRoutes.get('/me', requireFirebaseAuth, asyncHandler(userController.me));
+userRoutes.delete('/:userId', asyncHandler(userController.deleteAccount));

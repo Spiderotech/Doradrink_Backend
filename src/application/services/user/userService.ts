@@ -1,5 +1,14 @@
 import { userRepository } from '../../repositories/user/userRepository';
 import { ApiError } from '../../../framework/webserver/response/ApiError';
+import { Types } from 'mongoose';
+import { CompetitionDailyProgressModel } from '../../../framework/database/mongodb/models/competitionDailyProgressModel';
+import { CompetitionEntryModel } from '../../../framework/database/mongodb/models/competitionEntryModel';
+import { DeviceTokenModel } from '../../../framework/database/mongodb/models/deviceTokenModel';
+import { NotificationModel } from '../../../framework/database/mongodb/models/notificationModel';
+import { RewardLedgerModel } from '../../../framework/database/mongodb/models/rewardLedgerModel';
+import { UserModel } from '../../../framework/database/mongodb/models/userModel';
+import { VoucherModel } from '../../../framework/database/mongodb/models/voucherModel';
+import { WalletModel } from '../../../framework/database/mongodb/models/walletModel';
 
 export const userService = {
   getBootstrapUser: async (input: {
@@ -74,5 +83,40 @@ export const userService = {
       hydrationGoal: input.hydrationGoal || 2000,
       goalType: input.goalType || 'medium',
     });
+  },
+
+  deleteAccount: async (userId: string) => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw new ApiError('VALIDATION_ERROR', 'Valid user id is required.', 400);
+    }
+
+    const userObjectId = new Types.ObjectId(userId);
+    const user = await UserModel.findById(userObjectId).lean();
+    if (!user) {
+      throw new ApiError('NOT_FOUND', 'User was not found.', 404);
+    }
+
+    await Promise.all([
+      WalletModel.deleteOne({ userId: userObjectId }),
+      RewardLedgerModel.deleteMany({ userId: userObjectId }),
+      CompetitionEntryModel.deleteMany({ userId: userObjectId }),
+      CompetitionDailyProgressModel.deleteMany({ userId: userObjectId }),
+      NotificationModel.deleteMany({ target: 'user', userId: userObjectId }),
+      DeviceTokenModel.updateMany(
+        { userId: userObjectId },
+        { $set: { userId: null, enabled: false, lastSeenAt: new Date() } },
+      ),
+      VoucherModel.updateMany(
+        { assignedUserId: userObjectId },
+        { $set: { assignedUserId: null, status: 'expired' } },
+      ),
+    ]);
+
+    await UserModel.deleteOne({ _id: userObjectId });
+
+    return {
+      deleted: true,
+      retained: ['Verified purchase records may be retained for legal, tax, fraud prevention, and app-store reconciliation.'],
+    };
   },
 };

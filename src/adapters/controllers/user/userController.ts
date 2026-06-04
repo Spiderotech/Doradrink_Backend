@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { bootstrapUserUseCase } from '../../../application/useCase/user/bootstrapUserUseCase';
 import { getCurrentUserUseCase } from '../../../application/useCase/user/getCurrentUserUseCase';
+import { userService } from '../../../application/services/user/userService';
 import { AuthenticatedRequest } from '../../../framework/webserver/middlewares/authMiddleware';
 import { sendSuccess } from '../../../framework/webserver/response/response';
 import { ApiError } from '../../../framework/webserver/response/ApiError';
@@ -36,6 +37,15 @@ export const userController = {
     }
 
     const data = await getCurrentUserUseCase(auth.firebaseUid);
+    sendSuccess(res, data);
+  },
+
+  deleteAccount: async (req: Request, res: Response) => {
+    const params = z.object({
+      userId: z.string().min(1),
+    }).parse(req.params);
+
+    const data = await userService.deleteAccount(params.userId);
     sendSuccess(res, data);
   },
 };
