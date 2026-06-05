@@ -105,8 +105,8 @@ export const notificationService = {
         lastSeenAt: Date;
         userId?: Types.ObjectId;
       };
-      $setOnInsert: {
-        userId: Types.ObjectId | null;
+      $setOnInsert?: {
+        userId: null;
       };
     } = {
       $set: {
@@ -116,13 +116,14 @@ export const notificationService = {
         enabled: true,
         lastSeenAt: new Date(),
       },
-      $setOnInsert: {
-        userId: userObjectId,
-      },
     };
 
     if (userObjectId) {
       update.$set.userId = userObjectId;
+    } else {
+      update.$setOnInsert = {
+        userId: null,
+      };
     }
 
     return DeviceTokenModel.findOneAndUpdate(
