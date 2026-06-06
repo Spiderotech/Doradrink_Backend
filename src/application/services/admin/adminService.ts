@@ -425,6 +425,7 @@ export const adminService = {
     if (filters.search) {
       query.$or = [
         { username: new RegExp(filters.search, 'i') },
+        { email: new RegExp(filters.search, 'i') },
         { city: new RegExp(filters.search, 'i') },
         { firebaseUid: new RegExp(filters.search, 'i') },
         { guestId: new RegExp(filters.search, 'i') },

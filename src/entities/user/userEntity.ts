@@ -5,6 +5,7 @@ export type UserEntity = {
   firebaseUid?: string | null;
   guestId?: string | null;
   authMode: AuthMode;
+  email?: string | null;
   username: string;
   profilePictureUrl?: string | null;
   avatar?: string | null;

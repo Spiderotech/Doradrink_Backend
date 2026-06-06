@@ -23,6 +23,7 @@ export type GoogleBootstrapInput = {
 export const googleBootstrapUseCase = async (input: GoogleBootstrapInput) => {
   const user = await userService.getBootstrapUser({
     firebaseUid: input.firebaseUid,
+    email: input.email,
     username: input.username || input.name || input.email?.split('@')[0] || 'Dora User',
     country: input.country,
     city: input.city,

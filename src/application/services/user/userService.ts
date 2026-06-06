@@ -14,6 +14,7 @@ export const userService = {
   getBootstrapUser: async (input: {
     guestId?: string;
     firebaseUid?: string;
+    email?: string;
     username?: string;
     profilePictureUrl?: string;
     avatar?: string;
@@ -29,6 +30,7 @@ export const userService = {
     goalType?: string;
   }) => {
     const profileUpdates = {
+      email: input.email,
       username: input.username,
       profilePictureUrl: input.profilePictureUrl,
       avatar: input.avatar,
@@ -69,6 +71,7 @@ export const userService = {
       guestId: input.guestId,
       firebaseUid: input.firebaseUid,
       authMode: input.firebaseUid ? 'firebase' : 'guest',
+      email: input.email,
       username: input.username || 'Dora User',
       profilePictureUrl: input.profilePictureUrl,
       avatar: input.avatar,

@@ -5,6 +5,7 @@ const userSchema = new Schema(
     firebaseUid: { type: String, default: null },
     guestId: { type: String, default: null },
     authMode: { type: String, enum: ['guest', 'firebase'], required: true, default: 'guest' },
+    email: { type: String, default: null, lowercase: true, trim: true, index: true },
     username: { type: String, required: true, trim: true, index: true },
     profilePictureUrl: { type: String, default: null },
     avatar: { type: String, default: null },

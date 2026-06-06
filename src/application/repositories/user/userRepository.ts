@@ -5,6 +5,7 @@ export type CreateUserRecord = {
   guestId?: string;
   firebaseUid?: string;
   authMode: 'guest' | 'firebase';
+  email?: string;
   username: string;
   profilePictureUrl?: string;
   avatar?: string;
